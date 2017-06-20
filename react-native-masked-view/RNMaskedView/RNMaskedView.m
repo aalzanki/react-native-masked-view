@@ -25,8 +25,16 @@
 
 - (void)setMaskImage:(NSString *)imageString
 {
-    NSString *imageName = [RCTConvert NSString:imageString];
-    _maskUIImage = [UIImage imageNamed:imageName];
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		NSString *imageURL = [RCTConvert NSString:imageString];
+		NSURL *url = [NSURL URLWithString:imageURL];
+		NSData *data = [NSData dataWithContentsOfURL:url];
+		_maskUIImage = [[UIImage alloc]initWithData:data];
+
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self layoutSubviews];
+		});
+	});
 }
 
 - (void)displayLayer:(CALayer *)layer
